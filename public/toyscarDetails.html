@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toy Car Details</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 id="page-title">Toy Car Details</h1>
+        <div class="row">
+            <div class="col-md-6">
+                <img id="toy-image" class="img-fluid mb-4" src="" alt="Toy Image" onerror="this.src='/images/default.jpg'; this.alt='Default Toy Image';">
+            </div>
+            <div class="col-md-6">
+                <h2 id="toy-name" class="text-primary"></h2>
+                <p id="toy-description" class="toy-info"></p>
+                <p class="toy-info"><strong>Price: </strong><span id="toy-price"></span> USD</p>
+                <p class="toy-info"><strong>Color: </strong><span id="toy-color"></span></p>
+                <p class="toy-info"><strong>Dimensions: </strong><span id="toy-dimensions"></span></p>
+                <p class="toy-info"><strong>Material: </strong><span id="toy-material"></span></p>
+                <p class="toy-info"><strong>Origin: </strong><span id="toy-origin"></span></p>
+                <p class="toy-info"><strong>Manufacturer: </strong><span id="toy-manufacturer"></span></p>
+                <p class="toy-info"><strong>Weight: </strong><span id="toy-weight"></span> kg</p>
+                <p class="toy-info"><strong>Recommended Age: </strong><span id="toy-age"></span> years</p>
+                <a id="back-button" class="btn btn-primary mt-4" href="/">Back to Product List</a>
+            </div>
+        </div>
+        <div id="error-message" class="alert alert-danger mt-4" style="display: none;">An error occurred while loading toy details. Please try again later.</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const toyId = urlParams.get('id');
+
+            if (!toyId) {
+                console.error("Error: Missing toy ID in the URL");
+                document.getElementById('page-title').textContent = "Error: Missing Toy ID";
+                document.getElementById('error-message').style.display = 'block';
+                return;
+            }
+
+            fetch(`/toys`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Error fetching toy data: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(toys => {
+                    const toy = toys.find(item => item.id == toyId);
+                    if (!toy) {
+                        throw new Error("Error: Toy not found");
+                    }
+
+                    document.getElementById('toy-name').textContent = toy.type;
+                    document.getElementById('toy-description').textContent = `A ${toy.color} ${toy.type} made from ${toy.material}.`;
+                    document.getElementById('toy-price').textContent = toy.price;
+                    document.getElementById('toy-color').textContent = toy.color;
+                    document.getElementById('toy-dimensions').textContent = toy.dimensions;
+                    document.getElementById('toy-material').textContent = toy.material;
+                    document.getElementById('toy-origin').textContent = toy.origin;
+                    document.getElementById('toy-manufacturer').textContent = toy.manufacturer;
+                    document.getElementById('toy-weight').textContent = toy.weight;
+                    document.getElementById('toy-age').textContent = toy.recommended_age;
+                    document.getElementById('toy-image').src = toy.image;
+                })
+                .catch(err => {
+                    console.error("An error occurred while fetching toy details:", err);
+                    document.getElementById('page-title').textContent = "Error Loading Toy Details";
+                    document.getElementById('error-message').style.display = 'block';
+                });
+        });
+    </script>
+</body>
+</html>
